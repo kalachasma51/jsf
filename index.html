@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>jsf</title>
+</head>
+     <style>
+          body {
+            background-color: black;
+        }
+        pre {
+            color: white;
+        }
+    </style>
+<body>
+    <pre>
+1.a
+LABServ.java
+
+      
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+@WebServlet(asyncSupported = true, urlPatterns = { "/LabServ" })
+public class LabServ extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		response.setContentType("text/html");
+		PrintWriter out = response.getWriter();
+		out.println("<!DOCTYPE html>\r\n"
+				+ "<html>\r\n"
+				+ "<head>\r\n"
+				+ "<meta charset=\"UTF-8\">\r\n"
+				+ "<title>User Form</title>\r\n"
+				+ "</head>\r\n"
+				+ "<body>\r\n"
+				+ "	<h2>Submit your name and password</h2>\r\n"
+				+ "	<form action='LabServ' method='post'>\r\n"
+				+ "		Name: <input type='text' name='name' /><br>\r\n"
+				+ "		Password: <input type='password' name='password' /><br>\r\n"
+				+ "		<input type='submit' value='Submit' />\r\n"
+				+ "	</form>\r\n"
+				+ "</body>\r\n"
+				+ "</html>");
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String name = request.getParameter("name");
+		String password= request.getParameter("password");
+		response.setContentType("text/html");
+		PrintWriter out = response.getWriter();
+		out.println("<!DOCTYPE html>\r\n"
+				+ "<html>\r\n"
+				+ "<head>\r\n"
+				+ "<meta charset=\"UTF-8\">\r\n"
+				+ "<title>User Form</title>\r\n"
+				+ "</head>\r\n"
+				+ "<body>\r\n"
+				+ "	<h2>Submitted Details</h2>\r\n"
+				+ "	<p>Name: " + name + "</p>\r\n"
+				+ "	<p>Password: " + password + "</p>\r\n"
+				+ "</body>\r\n"
+				+ "</html>");
+	}
+
+}
+
+
+
+
+
+
+
+
+
+3.
+model:
+
+3        student.java
+
+package com.student.model; 
+ 
+public class Student { 
+    private int rollNo; 
+    private String name; 
+    private String email; 
+    private int age; 
+ 
+    // Constructors, Getters, and Setters 
+    public Student() { } 
+     
+    public Student(int rollNo, String name, String email, int age) { 
+        this.rollNo = rollNo; 
+        this.name = name; 
+        this.email = email; 
+        this.age = age; 
+    } 
+     
+    public int getRollNo() { return rollNo; } 
+    public void setRollNo(int rollNo) { this.rollNo = rollNo; } 
+     
+    public String getName() { return name; } 
+    public void setName(String name) { this.name = name; } 
+ 
+    public String getEmail() { return email; } 
+    public void setEmail(String email) { this.email = email; } 
+ 
+    public int getAge() { return age; } 
+    public void setAge(int age) { this.age = age; } 
+} 
+
+
+
+studentDAO.java
+
+package com.student.dao; 
+ 
+import com.student.model.Student; 
+import com.student.util.DBUtil; 
+import java.sql.*; 
+import java.util.ArrayList; 
+import java.util.List; 
+ 
+public class StudentDAO { 
+ 
+    // Insert student 
+    public void addStudent(Student student) throws SQLException { 
+        Connection con = DBUtil.getConnection(); 
+        String query = "INSERT INTO students(roll_no, name, email, age) VALUES(?, ?, ?, ?)"; 
+        PreparedStatement ps = con.prepareStatement(query); 
+        ps.setInt(1, student.getRollNo()); 
+        ps.setString(2, student.getName()); 
+        ps.setString(3, student.getEmail()); 
+        ps.setInt(4, student.getAge()); 
+        ps.executeUpdate(); 
+        ps.close(); 
+        con.close(); 
+    } 
+ 
+    // Retrieve all students 
+    public List<Student> getAllStudents() throws SQLException { 
+        List<Student> students = new ArrayList<>(); 
+        Connection con = DBUtil.getConnection(); 
+        Statement stmt = con.createStatement(); 
+        String query = "SELECT * FROM students"; 
+        ResultSet rs = stmt.executeQuery(query); 
+        while (rs.next()) { 
+            Student student = new Student(); 
+            student.setRollNo(rs.getInt("roll_no")); 
+            student.setName(rs.getString("name")); 
+            student.setEmail(rs.getString("email")); 
+            student.setAge(rs.getInt("age")); 
+            students.add(student); 
+        } 
+        rs.close(); 
+        stmt.close(); 
+        con.close(); 
+        return students; 
+    } 
+ 
+    // Update student 
+    public void updateStudent(Student student) throws SQLException { 
+        Connection con = DBUtil.getConnection(); 
+        String query = "UPDATE students SET name = ?, email = ?, age = ? WHERE roll_no = ?"; 
+        PreparedStatement ps = con.prepareStatement(query); 
+        ps.setString(1, student.getName()); 
+        ps.setString(2, student.getEmail()); 
+        ps.setInt(3, student.getAge()); 
+        ps.setInt(4, student.getRollNo()); 
+        ps.executeUpdate(); 
+        ps.close(); 
+        con.close(); 
+    }
+    
+ // Delete student 
+    public void deleteStudent(int rollNo) throws SQLException { 
+        Connection con = DBUtil.getConnection(); 
+        String query = "DELETE FROM students WHERE roll_no = ?"; 
+        PreparedStatement ps = con.prepareStatement(query); 
+        ps.setInt(1, rollNo); 
+        ps.executeUpdate(); 
+        ps.close(); 
+        con.close(); 
+    } 
+}
+
+
+
+DBUtil.java
+
+package com.student.util; 
+ 
+import java.sql.Connection; 
+import java.sql.DriverManager; 
+import java.sql.SQLException; 
+ 
+public class DBUtil { 
+    private static final String URL = "jdbc:mysql://localhost:3306/student"; 
+    private static final String USERNAME = "root"; 
+    private static final String PASSWORD = "root"; 
+ 
+    public static Connection getConnection() throws SQLException { 
+        try { 
+            Class.forName("com.mysql.cj.jdbc.Driver"); 
+        } catch (ClassNotFoundException e) { 
+            e.printStackTrace(); 
+        } 
+        return DriverManager.getConnection(URL, USERNAME, PASSWORD); 
+    } 
+} 
+
+</pre>
+</body>
+</html>
