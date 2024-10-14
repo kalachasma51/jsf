@@ -32,52 +32,42 @@ responses.
 	    
 SimpleServlet.java
 -------------------
-
-	    
-package com.example;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-@WebServlet("/SimpleServlet")
-public class SimpleServlet extends HttpServlet {
-private static final long serialVersionUID = 1L;
-@Override
-protected void doGet(HttpServletRequest request,
-HttpServletResponse response) throws ServletException,
-IOException {
-response.setContentType("text/html");
-PrintWriter out = response.getWriter();
-out.println("<html><body>");
-out.println("<h2>Submit Your Details</h2>");
-out.println("<form method='POST'
-action='SimpleServlet'>");
-out.println("Name: <input type='text'
-name='name'><br><br>");
-out.println("Password: <input type='password'
-name='password'><br><br>");
-out.println("<input type='submit' value='Submit'>");
-out.println("</form>");
-out.println("</body></html>");
-}
-@Override
-protected void doPost(HttpServletRequest request,
-HttpServletResponse response) throws ServletException,
-IOException {
 
-String name = request.getParameter("name");
-String password = request.getParameter("password");
-response.setContentType("text/html");
-PrintWriter out = response.getWriter();
-out.println("<html><body>");
-out.println("<h2>Submitted Data</h2>");
-out.println("Name: " + name + "<br>");
-out.println("Password: " + password + "<br>");
-out.println("</body></html>");
+
+	    @WebServlet("/labserv")
+public class labserv extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
+        out.println("<html><body>");
+        out.println("<h2>Submit Your Details</h2>");
+        out.println("<form method='POST' action='labserv'>");
+        out.println("Name: <input type='text' name='name'><br><br>");
+        out.println("Password: <input type='password' name='password'><br><br>");
+        out.println("<input type='submit' value='Submit'>");
+        out.println("</form>");
+        out.println("</body></html>");
+    }
 }
+
+
+protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    String name = request.getParameter("name");
+    String password = request.getParameter("password");
+    response.setContentType("text/html");
+    PrintWriter out = response.getWriter();
+    out.println("<html><body>");
+    out.println("<h2>Submitted Data</h2>");
+    out.println("Name: " + name + "<br>");
+    out.println("Password: " + password + "<br>");
+    out.println("</body></html>");
 }
 
 
@@ -103,128 +93,75 @@ response page.
 
 
 
-
-
-	    
-package com.example;
-import java.io.IOException;
-import java.io.PrintWriter;
-import javax.servlet.ServletException;
+import java.io.*;
+import java.util.*;
+import javax.servlet.*;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-@WebServlet("/ServletDemo/SessionServlet")
-public class SessionServlet extends HttpServlet {
-protected void processRequest(HttpServletRequest request,
-HttpServletResponse response) throws ServletException,
-IOException {
-response.setContentType("text/html;charset=UTF-8");
-try (PrintWriter out = response.getWriter()) {
-/* TODO output your page here. You may use
-following sample code. */
-out.println("<!DOCTYPE html>");
-out.println("<html>");
-out.println("<head>");
-out.println("<title>Servlet
-SessionServlet</title>");
-out.println("</head>");
-out.println("<body>");
-out.println("<h1>Servlet SessionServlet at " +
-request.getContextPath() + "</h1>");
-out.println("</body>");
-out.println("</html>");
-}
-}
-protected void doGet(HttpServletRequest request,
-HttpServletResponse response) throws ServletException,
-IOException {
+import javax.servlet.http.*;
 
-	
-response.setContentType("text/html");
-PrintWriter out = response.getWriter();
-// Check if the logout action is requested
-String action = request.getParameter("action");
-if ("logout".equals(action)) {
-HttpSession session = request.getSession(false);
-if (session != null) {
-session.invalidate(); // Invalidate the session
-}
-response.sendRedirect("SessionServlet"); //
-Redirect to the login page
-return;
-}
-// Check if session exists
-HttpSession session = request.getSession(false);
-if (session != null && session.getAttribute("username")
-!= null) {
-// User is logged in, display welcome message and
-session info
-out.println("<html><head><title>Welcome</title></head><body>");
-out.println("<h2>Welcome, " +
-session.getAttribute("username") + "!</h2>");
-out.println("<p><a
-href='SessionServlet?action=logout'>Logout</a></p>");
-out.println("<h3>Session Information:</h3>");
-out.println("<p>Session ID: " + session.getId() +
-"</p>");
-out.println("<p>Creation Time: " + new
-java.util.Date(session.getCreationTime()) + "</p>");
-out.println("<p>Last Accessed Time: " + new
-java.util.Date(session.getLastAccessedTime()) + "</p>");
-out.println("</body></html>");
-} else {
-// User is not logged in, display login form
-out.println("<html><head><title>Login</title></head><body>");
-out.println("<h2>Login</h2>");
-out.println("<form method='post'
-action='SessionServlet'>");
-out.println("Username: <input type='text'
-name='username'><br><br>");
-out.println("Password: <input type='password'
-name='password'><br><br>");
-out.println("<input type='submit' value='Login'>");
-out.println("</form>");
-out.println("</body></html>");
-}
-}
+@WebServlet("/Lab2serv")
+public class Lab2serv extends HttpServlet {
+    private static final long serialVersionUID = 1L;
 
-	    protected void doPost(HttpServletRequest request,
-HttpServletResponse response)
-throws ServletException, IOException {
-// Process login form submission
-String username = request.getParameter("username");
-String password = request.getParameter("password");
-// For demonstration purposes, validate against
-hardcoded credentials
-if (username != null && username.equals("admin") &&
-password != null && password.equals("password")) {
-// Login successful, create session and store
-username
-HttpSession session = request.getSession(true); //
-create new session if not exists
-session.setAttribute("username", username);
-// Redirect to doGet to display welcome message and
-session info
-response.sendRedirect("SessionServlet");
-} else {
-// Login failed, redirect back to login page
-response.sendRedirect("SessionServlet");
-}
-}
-protected void doDelete(HttpServletRequest request,
-HttpServletResponse response)
-throws ServletException, IOException {
-// Process logout (via DELETE request)
-HttpSession session = request.getSession(false);
-if (session != null) {
-session.invalidate(); // invalidate session
-}
-response.sendRedirect("SessionServlet");
-}
-}
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
 
+        // Check if the logout action is requested
+        String action = request.getParameter("action");
+        if ("logout".equals(action)) {
+            HttpSession session = request.getSession(false);
+            if (session != null) {
+                session.invalidate(); // Invalidate the session
+            }
+            response.sendRedirect("Lab2serv"); // Redirect to the login page
+            return;
+        }
+
+        // Check if session exists
+        HttpSession session = request.getSession(false);
+        if (session != null && session.getAttribute("username") != null) {
+            // User is logged in, display welcome message and session info
+            out.println("<html><head><title>Welcome</title></head><body>");
+            out.println("<h2>Welcome, " + session.getAttribute("username") + "!</h2>");
+            out.println("<p><a href='Lab2serv?action=logout'>Logout</a></p>");
+            out.println("<h3>Session Information:</h3>");
+            out.println("<p>Session ID: " + session.getId() + "</p>");
+            out.println("<p>Creation Time: " + new Date(session.getCreationTime()) + "</p>");
+            out.println("<p>Last Accessed Time: " + new Date(session.getLastAccessedTime()) + "</p>");
+            out.println("</body></html>");
+        } else {
+            // User is not logged in, display login form
+            out.println("<html><head><title>Login</title></head><body>");
+            out.println("<h2>Login</h2>");
+            out.println("<form method='post' action='Lab2serv'>");
+            out.println("Username: <input type='text' name='username'><br><br>");
+            out.println("Password: <input type='password' name='password'><br><br>");
+            out.println("<input type='submit' value='Login'>");
+            out.println("</form>");
+            out.println("</body></html>");
+        }
+    }
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Process login form submission
+        String username = request.getParameter("username");
+        String password = request.getParameter("password");
+
+        // For demonstration purposes, validate against hardcoded credentials
+        if (username != null && username.equals("admin") && password != null && password.equals("password")) {
+            // Login successful, create session and store username
+            HttpSession session = request.getSession(true); // create new session if not exists
+            session.setAttribute("username", username);
+
+            // Redirect to doGet to display welcome message and session info
+            response.sendRedirect("Lab2serv");
+        } else {
+            // Login failed, redirect back to login page
+            response.sendRedirect("Lab2serv");
+        }
+    }
+}
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Experiment No. 2a
@@ -242,108 +179,79 @@ o Calculate the birth year from the age.
 o Format the email address.
 Display the processed data in a formatted manner in employeeResult.jsp.
 	    
-employeeForm.jsp
-------------------
+EmpForm.jsp
 
-	    
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
 <head>
-<title>Employee Form</title>
+    <meta charset="UTF-8">
+    <title>Employee Details</title>
 </head>
 <body>
-<h2>Employee Information Form</h2>
-<form action="employeeResult.jsp" method="POST">
-<table>
-<tr>
-<td>Employee ID:</td>
-<td><input type="text" name="employeeId"
-required></td>
-</tr>
-<tr>
-<td>Name:</td>
-<td><input type="text" name="name"
-required></td>
-</tr>
-<tr>
-<td>Age:</td>
-<td><input type="number" name="age"
-required></td>
-</tr>
-<tr>
-<td>Department:</td>
-<td><input type="text" name="department"
-required></td>
-</tr>
-<tr>
-<td>Email:</td>
-<td><input type="email" name="email"
-required></td>
-</tr>
-<tr>
-<td colspan="2" style="text-align: center;">
-<input type="submit" value="Submit">
-</td>
-</tr>
-</table>
-</form>
+    <form method="POST" action="EmpResult.jsp">
+        <h1>Enter the following Employee details</h1>
+        Employee Id: <input type="text" name="eid"><br><br>
+        Employee Name: <input type="text" name="ename"><br><br>
+        Employee Age: <input type="text" name="eage"><br><br>
+        Employee Dept: <input type="text" name="edept"><br><br>
+        Employee Email: <input type="text" name="email"><br><br>
+        <input type="submit" value="Submit">
+    </form>
 </body>
 </html>
 
+EmpResult.jsp
 
 
 
-
-
-	    employeeResult.jsp
-	    -------------------
-
-
-	    
-<%@ page contentType="text/html;charset=UTF-8" language="java"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.util.Calendar" %>
 <!DOCTYPE html>
 <html>
 <head>
-<title>Employee Information</title>
+    <meta charset="UTF-8">
+    <title>Employee Information</title>
 </head>
 <body>
-<h2>Employee Information Result</h2>
-<%
-// Retrieve form data
-String employeeId = request.getParameter("employeeId");
-String name = request.getParameter("name");
-String ageStr = request.getParameter("age");
-String department = request.getParameter("department");
-String email = request.getParameter("email");
-// Process data
-int age = Integer.parseInt(ageStr);
-Calendar calendar = Calendar.getInstance();
-int currentYear = calendar.get(Calendar.YEAR);
-int birthYear = currentYear - age;
-String nameAndDepartment = name + " (" + department +
-")";
-// Format email
-String formattedEmail = email.toLowerCase();
-%>
-<table border="1">
-<tr>
-<th>Employee ID</th>
-<td><%= employeeId %></td>
-</tr>
-<tr>
-<th>Name and Department</th>
-<td><%= nameAndDepartment %></td>
-</tr>
-<tr>
-<th>Birth Year</th>
-<td><%= birthYear %></td>
-</tr>
-<tr>
-<th>Formatted Email</th>
-<td><%= formattedEmail %></td>
-</tr>
-</table>
+    <h2>Employee Information Result</h2>
+
+    <%
+    // Retrieve form data
+    String employeeId = request.getParameter("eid");
+    String name = request.getParameter("ename");
+    String ageStr = request.getParameter("eage");
+    String department = request.getParameter("edept");
+    String email = request.getParameter("email");
+
+    // Process data
+    int age = Integer.parseInt(ageStr);
+    Calendar calendar = Calendar.getInstance();
+    int currentYear = calendar.get(Calendar.YEAR);
+    int birthYear = currentYear - age;
+
+    String nameAndDepartment = name + " (" + department + ")";
+    String formattedEmail = email.toLowerCase();
+    %>
+
+    <table border="1">
+        <tr>
+            <th>Employee ID</th>
+            <td><%= employeeId %></td>
+        </tr>
+        <tr>
+            <th>Name and Department</th>
+            <td><%= nameAndDepartment %></td>
+        </tr>
+        <tr>
+            <th>Birth Year</th>
+            <td><%= birthYear %></td>
+        </tr>
+        <tr>
+            <th>Formatted Email</th>
+            <td><%= formattedEmail %></td>
+        </tr>
+    </table>
 </body>
 </html>
 
@@ -365,168 +273,160 @@ o Email follows a valid format (e.g., name@example.com).
 Display clear and descriptive error messages directly on employeeResult.jsp next to each
 field if validation criteria are not met, guiding users to correct their input.
 	
-employeeForm.jsp
-----------------
+EmpForm.jsp
 
-	
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
 <head>
-<title>Employee Form</title>
+    <meta charset="UTF-8">
+    <title>Employee Form</title>
 </head>
 <body>
-<h2>Employee Information Form</h2>
-<form action="employeeResult.jsp" method="POST">
-Employee ID: <input type="text" name="employeeId"
-required><br>
-Name: <input type="text" name="name" required><br>
-Age: <input type="number" name="age" required><br>
-Department:
-<select name="department" required>
-<option value="">Select</option>
-<option value="HR">HR</option>
-<option value="Finance">Finance</option>
-<option value="IT">IT</option>
-<option value="Sales">Sales</option>
-</select><br>
-Email: <input type="email" name="email" required><br>
-<input type="submit" value="Submit">
-</form>
+    <h2>Employee Information Form</h2>
+    <form action="EmpResult.jsp" method="POST">
+        Employee ID: <input type="text" name="empid" required><br><br>
+        Employee Name: <input type="text" name="ename" required><br><br>
+        Employee Age: <input type="number" name="eage" required><br><br>
+        Employee Department:
+        <select name="edept" required>
+            <option value="">Select</option>
+            <option value="HR">HR</option>
+            <option value="Finance">Finance</option>
+            <option value="IT">IT</option>
+            <option value="Sales">Sales</option>
+        </select><br><br>
+        Employee Email: <input type="email" name="email" required><br><br>
+        <input type="submit" value="Submit">
+    </form>
 </body>
 </html>
 
 
+EmpResult.jsp
 
-	employeeResult.jsp
-        ------------------
 
-	
-<%@ page contentType="text/html;charset=UTF-8" language="java"%>
+
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.util.regex.*" %>
 <!DOCTYPE html>
 <html>
 <head>
-<title>Employee Information</title>
+    <meta charset="UTF-8">
+    <title>Employee Information Result</title>
 </head>
 <body>
-<h2>Employee Information Result</h2>
-<%
-// Retrieve form data
-String employeeId = request.getParameter("employeeId");
-String name = request.getParameter("name");
-String ageStr = request.getParameter("age");
-String department = request.getParameter("department");
-String email = request.getParameter("email");
-// Initialize error messages
-String employeeIdError = "";
-String nameError = "";
-String ageError = "";
-String departmentError = "";
-String emailError = "";
-// Validation flags
-boolean isValid = true;
-// Validate Employee ID
-if (employeeId == null || employeeId.trim().isEmpty())
-{
-employeeIdError = "Employee ID is required.";
-isValid = false;
-}
-// Validate Name
-if (name == null || !name.matches("^[a-zA-Z\\s]+$")) {
-nameError = "Name must contain only letters and
-spaces.";
-isValid = false;
-}
-// Validate Age
-int age = 0;
-try {
-age = Integer.parseInt(ageStr);
-if (age < 18 || age > 65) {
-ageError = "Age must be between 18 and 65.";
-isValid = false;
-}
-} catch (NumberFormatException e) {
-ageError = "Age must be a valid numeric value.";
-isValid = false;
-}
-// Validate Department
-if (department == null || department.trim().isEmpty())
-{
-departmentError = "Department is required.";
-isValid = false;
-} else if (!department.matches("HR|Finance|IT|Sales"))
-{
-departmentError = "Invalid department selected.";
-isValid = false;
-}
-// Validate Email
-if (email == null || !email.matches("^[\\w.-]+@[\\w.-
-]+\\.[a-zA-Z]{2,}$")) {
-emailError = "Email must be in a valid format
-(e.g., name@example.com).";
-isValid = false;
-}
-if (isValid) {
-// Process data
-int currentYear =
-java.util.Calendar.getInstance().get(java.util.Calendar.YEAR);
-int birthYear = currentYear - age;
-String nameAndDepartment = name + " (" + department
-+ ")";
-// Format email
-String formattedEmail = email.toLowerCase();
-%>
-<table border="1">
-<tr>
-<th>Employee ID</th>
-<td><%= employeeId %></td>
-</tr>
-<tr>
-<th>Name and Department</th>
-<td><%= nameAndDepartment %></td>
-</tr>
-<tr>
-<th>Birth Year</th>
-<td><%= birthYear %></td>
-</tr>
-<tr>
-<th>Formatted Email</th>
-<td><%= formattedEmail %></td>
-</tr>
-</table>
-<%17
-} else {
-// Display error messages and guide the user
-%>
-<h3>Validation Errors</h3>
-<ul>
-<% if (!employeeIdError.isEmpty()) { %>
-<li><b>Employee ID:</b> <%= employeeIdError
-%></li>
-<% } %>
-<% if (!nameError.isEmpty()) { %>
-<li><b>Name:</b> <%= nameError %></li>
-<% } %>
-<% if (!ageError.isEmpty()) { %>
-<li><b>Age:</b> <%= ageError %></li>
-<% } %>
-<% if (!departmentError.isEmpty()) { %>
-<li><b>Department:</b> <%= departmentError
-%></li>
-<% } %>
-<% if (!emailError.isEmpty()) { %>
-<li><b>Email:</b> <%= emailError %></li>
-<% } %>
-</ul>
-<!--<a href="employeeForm.jsp">Go back to the
-form</a>-->
-<a href="index.html">Go back to the form</a>
-<%
-}
-%>
+    <h2>Employee Information Result</h2>
+    <%
+        // Retrieve form data
+        String employeeId = request.getParameter("empid");
+        String name = request.getParameter("ename");
+        String ageStr = request.getParameter("eage");
+        String department = request.getParameter("edept");
+        String email = request.getParameter("email");
+
+        // Initialize error messages
+        String employeeIdError = "";
+        String nameError = "";
+        String ageError = "";
+        String departmentError = "";
+        String emailError = "";
+
+        // Validation flags
+        boolean isValid = true;
+
+        // Validate Employee ID
+        if (employeeId == null || employeeId.trim().isEmpty()) {
+            employeeIdError = "Employee ID is required.";
+            isValid = false;
+        }
+
+        // Validate Name
+        if (name == null || !name.matches("^[a-zA-Z\\s]+$")) {
+            nameError = "Name must contain only letters and spaces.";
+            isValid = false;
+        }
+
+        // Validate Age
+        int age = 0;
+        try {
+            age = Integer.parseInt(ageStr);
+            if (age < 18 || age > 65) {
+                ageError = "Age must be between 18 and 65.";
+                isValid = false;
+            }
+        } catch (NumberFormatException e) {
+            ageError = "Age must be a valid numeric value.";
+            isValid = false;
+        }
+
+        // Validate Department
+        if (department == null || department.trim().isEmpty()) {
+            departmentError = "Department is required.";
+            isValid = false;
+        } else if (!department.matches("HR|Finance|IT|Sales")) {
+            departmentError = "Invalid department selected.";
+            isValid = false;
+        }
+
+        // Validate Email
+        if (email == null || !email.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$")) {
+            emailError = "Email must be in a valid format (e.g., name@example.com).";
+            isValid = false;
+        }
+
+        if (isValid) {
+            // Process data
+            int currentYear = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR);
+            int birthYear = currentYear - age;
+            String nameAndDepartment = name + " (" + department + ")";
+            String formattedEmail = email.toLowerCase();
+    %>
+            <table border="1">
+                <tr>
+                    <th>Employee ID</th>
+                    <td><%= employeeId %></td>
+                </tr>
+                <tr>
+                    <th>Name and Department</th>
+                    <td><%= nameAndDepartment %></td>
+                </tr>
+                <tr>
+                    <th>Birth Year</th>
+                    <td><%= birthYear %></td>
+                </tr>
+                <tr>
+                    <th>Formatted Email</th>
+                    <td><%= formattedEmail %></td>
+                </tr>
+            </table>
+    <%
+        } else {
+    %>
+        <h3>Validation Errors</h3>
+        <ul>
+            <% if (!employeeIdError.isEmpty()) { %>
+                <li><b>Employee ID:</b> <%= employeeIdError %></li>
+            <% } %>
+            <% if (!nameError.isEmpty()) { %>
+                <li><b>Name:</b> <%= nameError %></li>
+            <% } %>
+            <% if (!ageError.isEmpty()) { %>
+                <li><b>Age:</b> <%= ageError %></li>
+            <% } %>
+            <% if (!departmentError.isEmpty()) { %>
+                <li><b>Department:</b> <%= departmentError %></li>
+            <% } %>
+            <% if (!emailError.isEmpty()) { %>
+                <li><b>Email:</b> <%= emailError %></li>
+            <% } %>
+        </ul>
+        <a href="EmpForm.jsp">Go back to the form</a>
+    <%
+        }
+    %>
 </body>
 </html>
-
 
 
 
