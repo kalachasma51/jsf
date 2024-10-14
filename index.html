@@ -442,287 +442,386 @@ and Delete) operations on a `students` database table. The application should:
  Update: Modify existing student records.
  Delete: Remove student records from the database.
 	
-DBConnection.java
---------------------
-	
-package com.studentcrud;
+-------------------
+index.jsp
+	    ---------------------
+
+
+
+
+
+
+
+
+
+	    
+	    <%@page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<html>
+<head>
+    <title>Student Management</title>
+</head>
+<body>
+    <h1>Student Management</h1>
+    <a href="liststudent.jsp">View Students</a><br>
+    <a href="addstudent.jsp">Add New Student</a>
+</body>
+</html>
+
+--------------------------------------------------------
+		    Student.java
+		    --------------
+		    
+		    package com.student.model;
+
+public class Student {
+    private int rollNo;
+    private String name;
+    private String email;
+    private int age;
+
+    // Constructors, Getters, and Setters
+    public Student() { }
+
+    public Student(int rollNo, String name, String email, int age) {
+        this.rollNo = rollNo;
+        this.name = name;
+        this.email = email;
+        this.age = age;
+    }
+
+    public int getRollNo() { return rollNo; }
+    public void setRollNo(int rollNo) { this.rollNo = rollNo; }
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+
+    public int getAge() { return age; }
+    public void setAge(int age) { this.age = age; }
+}
+
+
+		-----------------------
+		    DBUtil.java
+		    -------------
+		    package com.student.util;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-public class DBConnection {
-private static String jdbcURL =
-"jdbc:mysql://localhost:3306/studentDB";
-private static String jdbcUsername = "root";
-private static String jdbcPassword = "password";
-public static Connection getConnection() {
-Connection connection = null;
-try {
-Class.forName("com.mysql.jdbc.Driver");
-connection = DriverManager.getConnection(jdbcURL,
-jdbcUsername, jdbcPassword);
-} catch (ClassNotFoundException | SQLException e) {
-e.printStackTrace();
-}
-return connection;
-}
-}
-Student.java
-package com.studentcrud;
-public class Student {
-private int rollNo;
-private String name;
-private String email;
-private int age;
-// Getters
-public int getRollNo() {
-return rollNo;
-}
-public String getName() {
-return name;
-}
-public String getEmail() {
-return email;
-}
-public int getAge() {
-return age;
-}
-// Setters
-public void setRollNo(int rollNo) {
-this.rollNo = rollNo;
-}
-public void setName(String name) {
-this.name = name;
-}
-public void setEmail(String email) {
-this.email = email;
-}
-public void setAge(int age) {
-this.age = age;
-}
-// toString method
-@Override
-public String toString() {
-return "Student{" +
-"rollNo=" + rollNo +
-", name='" + name + '\'' +
-", email='" + email + '\'' +
-", age=" + age +
-'}';
-}
+
+public class DBUtil {
+    private static final String URL = "jdbc:mysql://localhost:3306/student";
+    private static final String USERNAME = "student";
+    private static final String PASSWORD = "student";
+
+    public static Connection getConnection() throws SQLException {
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return DriverManager.getConnection(URL, USERNAME, PASSWORD);
+    }
 }
 
+	------------------------------
+		    StudentDAO.java
+		    -------------------
 
-	
-StudentDAO.java
-----------------
+		    
+		    package com.student.dao;
 
-
-	
-package com.studentcrud;
+import com.student.model.Student;
+import com.student.util.DBUtil;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+
 public class StudentDAO {
-public void addStudent(Student student) {
-String sql = "INSERT INTO students (roll_no, name,
-email, age) VALUES (?, ?, ?, ?)";
-try (Connection connection =
-DBConnection.getConnection();
-PreparedStatement preparedStatement =
-connection.prepareStatement(sql)) {
-preparedStatement.setInt(1, student.getRollNo());
-preparedStatement.setString(2, student.getName());
-preparedStatement.setString(3,
-student.getEmail());
-preparedStatement.setInt(4, student.getAge());
-preparedStatement.executeUpdate();
-} catch (SQLException e) {
-e.printStackTrace();
-}
-}
-public List<Student> getAllStudents() {
-List<Student> students = new ArrayList<>();
-String sql = "SELECT * FROM students";
-try (Connection connection =
-DBConnection.getConnection();
-Statement statement =
-connection.createStatement();
-ResultSet resultSet =
-statement.executeQuery(sql)) {
-while (resultSet.next()) {
-Student student = new Student();
-student.setRollNo(resultSet.getInt("roll_no"));
-student.setName(resultSet.getString("name"));
-student.setEmail(resultSet.getString("email"));
-student.setAge(resultSet.getInt("age"));
-students.add(student);
-}
-} catch (SQLException e) {
-e.printStackTrace();
-}
-return students;
-}
-public void updateStudent(Student student) {
-String sql = "UPDATE students SET name = ?, email = ?,
-age = ? WHERE roll_no = ?";
-try (Connection connection =
-DBConnection.getConnection();
-PreparedStatement preparedStatement =
-connection.prepareStatement(sql)) {
-preparedStatement.setString(1, student.getName());
-preparedStatement.setString(2,
-student.getEmail());
-preparedStatement.setInt(3, student.getAge());
-preparedStatement.setInt(4, student.getRollNo());
-preparedStatement.executeUpdate();
-} catch (SQLException e) {
-e.printStackTrace();
-}
-}
-public void deleteStudent(int rollNo) {
-String sql = "DELETE FROM students WHERE roll_no = ?";
-try (Connection connection =
-DBConnection.getConnection();
-PreparedStatement preparedStatement =
-connection.prepareStatement(sql)) {
-preparedStatement.setInt(1, rollNo);
-preparedStatement.executeUpdate();
-} catch (SQLException e) {
-e.printStackTrace();
-}
-}
-}
-addStudent.jsp
-<%@ page import="com.studentcrud.Student,
-com.studentcrud.StudentDAO" %>
-<%
-if(request.getParameter("rollNo") != null) {
-int rollNo =
-Integer.parseInt(request.getParameter("rollNo"));
-String name = request.getParameter("name");
-String email = request.getParameter("email");
-int age =
-Integer.parseInt(request.getParameter("age"));
-Student student = new Student();
-student.setRollNo(rollNo);
-student.setName(name);
-student.setEmail(email);
-student.setAge(age);
-StudentDAO dao = new StudentDAO();
-dao.addStudent(student);
-out.println("Student added successfully.");
-}
-	24
-%>
-<html>
-<body>
-<h2>Add Student</h2>
-<form action="addStudent.jsp" method="post">
-Roll No: <input type="text" name="rollNo"><br>
-Name: <input type="text" name="name"><br>
-Email: <input type="text" name="email"><br>
-Age: <input type="text" name="age"><br>
-<input type="submit" value="Add Student">
-</form>
-<a href="viewStudents.jsp">View Students</a>
-</body>
-</html>
-viewStudents.jsp
-<%@ page import="java.util.List, com.studentcrud.Student,
-com.studentcrud.StudentDAO" %>
-<%
-StudentDAO dao = new StudentDAO();
-List<Student> students = dao.getAllStudents();
-%>
-<html>
-<body>
-<h2>View Students</h2>
-<table border="1">
-<tr>
-<th>Roll No</th>
-<th>Name</th>
-<th>Email</th>
-<th>Age</th>
-<th>Actions</th>
-</tr>
-<%
-for(Student student : students) {
-%>
-<tr>
-<td><%= student.getRollNo() %></td>
-<td><%= student.getName() %></td>
-<td><%= student.getEmail() %></td>
-<td><%= student.getAge() %></td>
-<td>
-<a href="updateStudent.jsp?rollNo=<%=
-student.getRollNo() %>">Edit</a> |
-<a href="deleteStudent.jsp?rollNo=<%=
-student.getRollNo() %>">Delete</a>
-</td>
-</tr>
-<%
+    // Insert student
+    public void addStudent(Student student) throws SQLException {
+        Connection con = DBUtil.getConnection();
+        String query = "INSERT INTO stud1(roll_no, name, email, age) VALUES(?, ?, ?, ?)";
+        PreparedStatement ps = con.prepareStatement(query);
+        ps.setInt(1, student.getRollNo());
+        ps.setString(2, student.getName());
+        ps.setString(3, student.getEmail());
+        ps.setInt(4, student.getAge());
+        ps.executeUpdate();
+        ps.close();
+        con.close();
+    }
+
+    // Retrieve all students
+    public List<Student> getAllStudents() throws SQLException {
+        List<Student> students = new ArrayList<>();
+        Connection con = DBUtil.getConnection();
+        Statement stmt = con.createStatement();
+        String query = "SELECT * FROM stud1";
+        ResultSet rs = stmt.executeQuery(query);
+        while (rs.next()) {
+            Student student = new Student();
+            student.setRollNo(rs.getInt("roll_no"));
+            student.setName(rs.getString("name"));
+            student.setEmail(rs.getString("email"));
+            student.setAge(rs.getInt("age"));
+            students.add(student);
+        }
+        rs.close();
+        stmt.close();
+        con.close();
+        return students;
+    }
+
+    // Update student
+    public void updateStudent(Student student) throws SQLException {
+        Connection con = DBUtil.getConnection();
+        String query = "UPDATE stud1 SET name = ?, email = ?, age = ? WHERE roll_no = ?";
+        PreparedStatement ps = con.prepareStatement(query);
+        ps.setString(1, student.getName());
+        ps.setString(2, student.getEmail());
+        ps.setInt(3, student.getAge());
+        ps.setInt(4, student.getRollNo());
+        ps.executeUpdate();
+        ps.close();
+        con.close();
+    }
+
+    // Delete student
+    public void deleteStudent(int rollNo) throws SQLException {
+        Connection con = DBUtil.getConnection();
+        String query = "DELETE FROM stud1 WHERE roll_no = ?";
+        PreparedStatement ps = con.prepareStatement(query);
+        ps.setInt(1, rollNo);
+        ps.executeUpdate();
+        ps.close();
+        con.close();
+    }
 }
 
-%>
-</table>
-<a href="addStudent.jsp">Add Student</a>
+
+---------------------
+addstudent.jsp
+-------------------
+
+		<%@page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@page import="com.student.dao.StudentDAO"%>
+<%@page import="com.student.model.Student"%>
+<html>
+<head>
+    <title>Add Student</title>
+</head>
+<body>
+    <h2>Add Student</h2>
+    <form action="addstudent.jsp" method="post">
+        Roll No: <input type="text" name="rollNo"><br>
+        Name: <input type="text" name="name"><br>
+        Email: <input type="text" name="email"><br>
+        Age: <input type="text" name="age"><br>
+        <input type="submit" value="Add Student">
+    </form>
+    <%
+        if (request.getMethod().equals("POST")) {
+            int rollNo = Integer.parseInt(request.getParameter("rollNo"));
+            String name = request.getParameter("name");
+            String email = request.getParameter("email");
+            int age = Integer.parseInt(request.getParameter("age"));
+            Student s1 = new Student(rollNo, name, email, age);
+            StudentDAO dao = new StudentDAO();
+            dao.addStudent(s1);
+            out.println("<p>Student added successfully!</p>");
+        }
+    %>
+    <a href="index.jsp">Back to Home</a>
 </body>
 </html>
-updateStudent.jsp
-<%@ page import="com.studentcrud.Student,
-com.studentcrud.StudentDAO" %>
-<%
-StudentDAO dao = new StudentDAO();
-int rollNo =
-Integer.parseInt(request.getParameter("rollNo"));
-Student student = new Student();
-for(Student s : dao.getAllStudents()) {
-if(s.getRollNo() == rollNo) {
-student = s;
-break;
-}
-}
-if(request.getParameter("name") != null) {
-String name = request.getParameter("name");
-String email = request.getParameter("email");
-int age =
-Integer.parseInt(request.getParameter("age"));
-student.setName(name);
-student.setEmail(email);
-student.setAge(age);
-dao.updateStudent(student);
-out.println("Student updated successfully.");
-}
-%>
+
+
+
+
+
+----------------------------------
+	deletestudent.jsp
+	---------------------
+
+
+	<%@page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@page import="com.student.dao.StudentDAO"%>
+<%@page import="com.student.model.Student"%>
+<%@page import="java.util.List"%>
 <html>
+<head>
+    <title>List Students</title>
+</head>
 <body>
-<h2>Update Student</h2>
-<form action="updateStudent.jsp?rollNo=<%=
-student.getRollNo() %>" method="post">
-Name: <input type="text" name="name" value="<%=
-student.getName() %>"><br>
-Email: <input type="text" name="email" value="<%=
-student.getEmail() %>"><br>
-Age: <input type="text" name="age" value="<%=
-student.getAge() %>"><br>
-<input type="submit" value="Update Student">
-</form>
-	
-<a href="viewStudents.jsp">View Students</a>
+    <h2>Student List</h2>
+    <table border="1">
+        <tr>
+            <th>Roll No</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Age</th>
+            <th>Actions</th>
+        </tr>
+        <%
+            StudentDAO dao = new StudentDAO();
+            List<Student> students = dao.getAllStudents();
+            for (Student student : students) {
+        %>
+        <tr>
+            <td><%= student.getRollNo() %></td>
+            <td><%= student.getName() %></td>
+            <td><%= student.getEmail() %></td>
+            <td><%= student.getAge() %></td>
+            <td>
+                <a href="updatestudent.jsp?rollNo=<%= student.getRollNo() %>">Update</a>
+                <a href="deletestudent.jsp?rollNo=<%= student.getRollNo() %>">Delete</a>
+            </td>
+        </tr>
+        <% } %>
+    </table>
+    <a href="index.jsp">Back to Home</a>
 </body>
 </html>
-deleteStudent.jsp
-<%@ page import="com.studentcrud.StudentDAO" %>
-<%
-int rollNo =
-Integer.parseInt(request.getParameter("rollNo"));
-StudentDAO dao = new StudentDAO();
-dao.deleteStudent(rollNo);
-out.println("Student deleted successfully.");
-%>
+
+
+
+
+---------------------
+liststudent.jsp
+		--------------------
+
+		<%@page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@page import="com.student.dao.StudentDAO"%>
+<%@page import="com.student.model.Student"%>
+<%@page import="java.util.List"%>
 <html>
+<head>
+    <title>List Students</title>
+</head>
 <body>
-<a href="viewStudents.jsp">View Students</
+    <h2>Student List</h2>
+    <table border="1">
+        <tr>
+            <th>Roll No</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Age</th>
+            <th>Actions</th>
+        </tr>
+        <%
+            StudentDAO dao = new StudentDAO();
+            List<Student> students = dao.getAllStudents();
+            for (Student student : students) {
+        %>
+        <tr>
+            <td><%= student.getRollNo() %></td>
+            <td><%= student.getName() %></td>
+            <td><%= student.getEmail() %></td>
+            <td><%= student.getAge() %></td>
+            <td>
+                <a href="updatestudent.jsp?rollNo=<%= student.getRollNo() %>">Update</a>
+                <a href="deletestudent.jsp?rollNo=<%= student.getRollNo() %>">Delete</a>
+            </td>
+        </tr>
+        <% } %>
+    </table>
+    <a href="index.jsp">Back to Home</a>
+</body>
+</html>
+
+----------------------
+deletestudent.jsp
+		----------------
+
+		<%@page import="com.student.dao.StudentDAO" %>
+<%@page import="java.sql.SQLException" %>
+<html>
+<head>
+    <title>Delete Student</title>
+</head>
+<body>
+    <h2>Delete Student</h2>
+    <!-- Form to input the Roll No (USN) of the student to delete -->
+    <form action="deletestudent.jsp" method="post">
+        Enter Roll No (USN) of the student to delete:
+        <input type="text" name="rollNo"><br><br>
+        <input type="submit" value="Delete Student">
+    </form>
+    <%
+        if (request.getMethod().equals("POST")) {
+            String rollNoStr = request.getParameter("rollNo");
+            if (rollNoStr != null && !rollNoStr.trim().isEmpty()) {
+                int rollNo = Integer.parseInt(rollNoStr);
+                StudentDAO dao = new StudentDAO();
+                try {
+                    dao.deleteStudent(rollNo);
+                    out.println("<p>Student with Roll No " + rollNo + " has been deleted successfully!</p>");
+                } catch (SQLException e) {
+                    out.println("<p>Error occurred while deleting the student. Please try again.</p>");
+                    e.printStackTrace();
+                }
+            } else {
+                out.println("<p>Please enter a valid Roll No.</p>");
+            }
+        }
+    %>
+    <br>
+    <a href="index.jsp">Back to Home</a>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+------------------------
+updatestudent.jsp
+		-------------------
+----------------
+
+
+
+	<%@page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@page import="com.student.dao.StudentDAO"%>
+<%@page import="com.student.model.Student"%>
+<html>
+<head>
+    <title>Update Student</title>
+</head>
+<body>
+    <h2>Update Student</h2>
+    <%
+
+================================================
+	    MySQL:
+Open a terminal window and enter the following command:
+mysql –u student –p
+student
+1. To show all available databases : show databases;
+2. To create a new database: create database [database_name];
+Example: create database Stud;
+3. To use a database: use [database_name];
+Example: use Stud;
+4. To create a new table: create table [table_name](attibute1
+datatype, attribute2 datatype, attribute3 datatype);
+Example: create table Stud1(roll_no integer, name
+varchar(20), email varchar(20), age integer);
+5. To insert a new tuple : insert into [table_name] values(
+attributevalue1, attribute value2, attributevalue3);
+Example: insert into Stud1 values( 101, ”Ramesh”,
+ram@gmail.com, 20);
+6. To list all the table tuples: select * from table_name;
+Example: select * from Stud1;
+================================================
 	
 </pre>
 </body>
